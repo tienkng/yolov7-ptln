@@ -1,0 +1,12 @@
+python yolo/train.py \
+  --epochs 2 \
+  --workers 8 \
+  --device 0 \
+  --batch-size 10 \
+  --do-train \
+  --data datahub/gender2k/data.yaml \
+  --img 640 640 \
+  --cfg cfg/training/yolov7.yaml \
+  --name 'testcode' \
+  --hyp data/hyp.scratch.custom.yaml \
+  --weight yolov7.pt
