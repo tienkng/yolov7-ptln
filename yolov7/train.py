@@ -35,6 +35,8 @@ def main(opt, tb_writer=None):
         hyp = yaml.load(f, Loader=yaml.SafeLoader)  # load hyps
     hyp.update(vars(opt))
     
+    print("\n\nDebug: ", hyp, "\n\n")
+    
     with open(opt.data) as f:
         data_dict = yaml.load(f, Loader=yaml.SafeLoader)  # data dict
     
@@ -102,7 +104,6 @@ def main(opt, tb_writer=None):
                                             world_size=opt.world_size, workers=opt.workers,
                                             image_weights=opt.image_weights, quad=opt.quad, prefix=colorstr('train: '))
     mlc = np.concatenate(dataset.labels, 0)[:, 0].max()  # max label class
-    nb = len(train_dataloader)  # number of batches
     assert mlc < num_classes, 'Label class %g exceeds nc=%g in %s. Possible class labels are 0-%g' % (mlc, num_classes, opt.data, num_classes - 1)
 
     # Process 0
@@ -132,6 +133,7 @@ def main(opt, tb_writer=None):
     hyp['cls'] *= num_classes / 80. * 3. / nl  # scale to classes and layers
     hyp['obj'] *= (imgsz / 640) ** 2 * 3. / nl  # scale to image size and layers
     hyp['label_smoothing'] = opt.label_smoothing
+    hyp['save_dir'] = opt.save_dir
     model.nc = num_classes  # attach number of classes to model
     model.hyp = hyp  # attach hyperparameters to model
     model.gr = 1.0  # iou loss ratio (obj_loss = 1.0 or iou)
@@ -236,6 +238,7 @@ if __name__ == '__main__':
     opt.img_size.extend([opt.img_size[-1]] * (2 - len(opt.img_size)))  # extend to 2 sizes (train, test)
     opt.name = 'evolve' if opt.evolve else opt.name
     opt.save_dir = increment_path(Path(opt.project) / opt.name, exist_ok=opt.exist_ok | opt.evolve)  # increment run
+    opt.save_txt = True 
     yaml_file = Path(opt.save_dir) / 'hyp_evolved.yaml'  # save best result here
 
     set_logging(opt.global_rank)
