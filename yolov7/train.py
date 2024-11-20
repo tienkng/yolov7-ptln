@@ -34,12 +34,11 @@ def main(opt, tb_writer=None):
     with open(opt.hyp) as f:
         hyp = yaml.load(f, Loader=yaml.SafeLoader)  # load hyps
     hyp.update(vars(opt))
-    
-    print("\n\nDebug: ", hyp, "\n\n")
-    
+
     with open(opt.data) as f:
         data_dict = yaml.load(f, Loader=yaml.SafeLoader)  # data dict
     
+    # print config training
     for k, v in hyp.items():
         print(k, "\t", v)
     
@@ -145,8 +144,8 @@ def main(opt, tb_writer=None):
     
     # Create callback functions
     model_checkpoint = ModelCheckpoint(save_top_k=3,
-                        monitor="train/loss",
-                        mode="min", dirpath="output/",
+                        monitor="metrics/fi",
+                        mode="max", dirpath=f'{opt.save_dir}/weights',
                         filename="sample-{epoch:02d}",
                         save_weights_only=True)
     
